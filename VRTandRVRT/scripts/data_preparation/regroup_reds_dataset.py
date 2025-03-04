@@ -24,16 +24,16 @@ def regroup_reds_dataset(train_path, val_path):
 
 if __name__ == '__main__':
     # train_sharp
-    train_path = '/home/userful/Ali/train/train_sharp'
-    val_path = '/home/userful/Ali/val/val_sharp'
+    train_path = 'path to train/train_sharp'
+    val_path = 'path to val/val_sharp'
     regroup_reds_dataset(train_path, val_path)
 
     # train_sharp_bicubic
-    train_path = '/home/userful/Ali/train/train_sharp_bicubic/X4'
-    val_path = '/home/userful/Ali/val/val_sharp_bicubic/X4'
+    train_path = 'path to train/train_sharp_bicubic/X4'
+    val_path = 'path to val/val_sharp_bicubic/X4'
     regroup_reds_dataset(train_path, val_path)
 
     # train_blur (for video deblurring)
-    train_path = '/home/userful/Ali/train/train_blur'
-    val_path = '/home/userful/Ali/val/val_blur'
+    train_path = 'path to train/train_blur'
+    val_path = 'path to val/val_blur'
     regroup_reds_dataset(train_path, val_path)

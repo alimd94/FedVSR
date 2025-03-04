@@ -136,7 +136,7 @@ def _partition_data(
         if name != 'kinetics':
             raise ValueError("Non-IID partitioning is only supported for the Kinetics dataset, REDS has no labels.")
 
-        with open('/home/userful/Ali/updated_file.json', 'r') as f:
+        with open('updated_file.json', 'r') as f:
             loaded_lookup = json.load(f)
         adjusted_video_labels = {}
         indices_to_remove=[]

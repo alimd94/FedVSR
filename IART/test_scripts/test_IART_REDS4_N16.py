@@ -1,5 +1,4 @@
-# import sys
-# sys.path.insert(0, '/home/userful/Ali/FedVSR/KAIR/iart/IART/archs')
+
 import cv2
 import glob
 import logging

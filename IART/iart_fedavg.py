@@ -69,7 +69,7 @@ flwr.common.logger.configure(identifier="myFlowerExperiment", filename="log.txt"
 
 def parse_options(root_path, is_train=True):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-opt', type=str, default="/home/userful/Ali/FedVSR/KAIR/iart/IART/options/IART_REDS_N16_600K.yml")
+    parser.add_argument('-opt', type=str, default="options/IART_REDS_N16_600K.yml")
     parser.add_argument('--launcher', choices=['none', 'pytorch', 'slurm'], default='none', help='job launcher')
     parser.add_argument('--auto_resume', action='store_true')
     parser.add_argument('--debug', action='store_true')
