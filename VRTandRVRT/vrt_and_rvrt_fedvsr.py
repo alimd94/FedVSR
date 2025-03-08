@@ -61,8 +61,8 @@ from flwr.common import (
     Scalar,
     parameters_to_ndarrays,
 )
-import pickle
-from load_model import load1
+from pytorch_wavelets import DWTForward
+
 
 DEVICE = torch.device("cuda:0")  
 
@@ -110,6 +110,31 @@ torch.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
 
 
+class HighFreqLoss(nn.Module):
+    """Charbonnier Loss (L1)"""
+
+    def __init__(self, eps=1e-9):
+        super(HighFreqLoss, self).__init__()
+        self.eps = eps
+        self.dwt = DWTForward(J=1, wave='db1', mode='zero')
+
+    def forward(self, x, y,alpha=0.5,penalty=0.1):
+      
+        b,t, c, h, w = x.size()
+        x = x.reshape(-1, c, h, w)
+        y = y.reshape(-1, c, h, w)
+
+        _, Yh_x = self.dwt(x)
+        _, Yh_y = self.dwt(y)
+        # print("Yh requires_grad:", Yh_x[0].requires_grad)
+        diff = Yh_x[0] - Yh_y[0]
+        loss_hf = torch.mean(torch.sqrt((diff * diff) + self.eps))
+
+        alpha*loss_hf
+        return loss
+
+HiFreLoss = HighFreqLoss()
+
 def get_parameters(net) -> List[np.ndarray]:
     return [val.cpu().numpy() for _, val in net.netG.state_dict().items()]
 
@@ -136,7 +161,7 @@ def train_with_newLoss(net, trainloader, epochs,client_id):
 
             net.G_optimizer.zero_grad()
             net.netG_forward()
-            G_loss = net.G_lossfn(net.E, net.H)
+            G_loss = net.G_lossfn(net.E, net.H) + HiFreLoss(net.E, net.H)
 
             G_loss.backward()
 
