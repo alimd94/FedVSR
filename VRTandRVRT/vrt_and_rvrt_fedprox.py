@@ -1,34 +1,18 @@
 from collections import OrderedDict
-from typing import Dict, List, Optional, Tuple
-
+from typing import  List
 import numpy as np
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torchvision.transforms as transforms
-from torch.utils.data import DataLoader
-
 import flwr
 from flwr.client import Client, ClientApp, NumPyClient
-from flwr.server import ServerApp, ServerConfig, ServerAppComponents
-from flwr.server.strategy import FedAvg, FedAdagrad
-from flwr.simulation import run_simulation
+from flwr.server import ServerConfig
 from flwr.common import ndarrays_to_parameters, NDArrays, Scalar, Context
-from flwr_datasets import FederatedDataset
-
-import sys
 import os.path
 import math
 import argparse
-import time
 import random
-import cv2
 import numpy as np
 from collections import OrderedDict
-import logging
 import torch
-from torch.utils.data import DataLoader
-from torch.utils.data.distributed import DistributedSampler
 from utils import utils_image as util
 from utils import utils_option as option
 from data.select_dataset import define_Dataset
@@ -36,38 +20,18 @@ from models.select_model import define_Model
 from models.model_vrt import ModelVRT as M
 from dataset import load_datasets
 import os
-from logging import INFO, DEBUG
-from flwr.common.logger import log
-import copy
-from flwr.server.client_proxy import ClientProxy
-from flwr.server.client_manager import ClientManager
-from typing import Optional, Union
-from flwr.common import (
-    FitRes,
-    Parameters,
-    Scalar,
-)
 from utils.utils_regularizers import regularizer_orth, regularizer_clip
-from math import exp
-
 from functools import reduce
-# import mmcv
-import re
 from flwr.common import (
-    FitRes,
     NDArrays,
-    Parameters,
-    Scalar,
     parameters_to_ndarrays,
 )
 
 DEVICE = torch.device("cuda:0")  
-
-
 flwr.common.logger.configure(identifier="myFlowerExperiment", filename="log.txt")
 
-json_path='options/vrt/002_train_vrt_videosr_bi_reds_16frames.json'
-# json_path='options/rvrt/001_train_rvrt_videosr_bi_reds_30frames.json'
+# json_path='options/vrt/002_train_vrt_videosr_bi_reds_16frames.json'
+json_path='options/rvrt/001_train_rvrt_videosr_bi_reds_30frames.json'
 
 
 parser = argparse.ArgumentParser()
@@ -93,7 +57,7 @@ option.save(opt)
 opt = option.dict_to_nonedict(opt)
 
 NUM_PARTITIONS = 40
-BATCH_SIZE = 3
+BATCH_SIZE = 4
 RND = 0
 PROXIMAL_MU = 1e-3 # 1, 0.1, 0.01
 NUM_ROUNDS = 100

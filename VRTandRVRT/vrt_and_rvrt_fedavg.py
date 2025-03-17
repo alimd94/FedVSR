@@ -1,34 +1,18 @@
 from collections import OrderedDict
-from typing import Dict, List, Optional, Tuple
-
+from typing import List
 import numpy as np
 import torch
-import torch.nn as nnP
-import torch.nn.functional as F
-import torchvision.transforms as transforms
-from torch.utils.data import DataLoader
-
 import flwr
 from flwr.client import Client, ClientApp, NumPyClient
-from flwr.server import ServerApp, ServerConfig, ServerAppComponents
-from flwr.server.strategy import FedAvg, FedAdagrad
-from flwr.simulation import run_simulation
+from flwr.server import ServerConfig
 from flwr.common import ndarrays_to_parameters, NDArrays, Scalar, Context
-from flwr_datasets import FederatedDataset
-
-import sys
 import os.path
 import math
 import argparse
-import time
 import random
-import cv2
 import numpy as np
 from collections import OrderedDict
-import logging
 import torch
-from torch.utils.data import DataLoader
-from torch.utils.data.distributed import DistributedSampler
 from utils import utils_image as util
 from utils import utils_option as option
 from data.select_dataset import define_Dataset
@@ -36,26 +20,9 @@ from models.select_model import define_Model
 from models.model_vrt import ModelVRT as M
 from dataset import load_datasets
 import os
-from logging import INFO, DEBUG
-from flwr.common.logger import log
-
-from flwr.server.client_proxy import ClientProxy
-from flwr.server.client_manager import ClientManager
-from typing import Optional, Union
-from flwr.common import (
-    FitRes,
-    Parameters,
-    Scalar,
-)
-from math import exp
-
 from functools import reduce
-import re
 from flwr.common import (
-    FitRes,
     NDArrays,
-    Parameters,
-    Scalar,
     parameters_to_ndarrays,
 )
 
@@ -91,7 +58,7 @@ option.save(opt)
 opt = option.dict_to_nonedict(opt)
 
 NUM_PARTITIONS = 40
-BATCH_SIZE = 1
+BATCH_SIZE = 4
 NUM_ROUNDS = 100
 NUM_PARTICIPATION = 4
 SAVE_DIR = "RVRT_FedAVG"

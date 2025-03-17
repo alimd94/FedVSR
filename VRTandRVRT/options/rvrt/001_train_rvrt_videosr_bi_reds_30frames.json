@@ -75,7 +75,7 @@
 
 
   , "train": {
-    "G_lossfn_type": "charbonnier"
+    "G_lossfn_type": "charbonnier" //"highfreq" for FedVSR and "charbonnier" for normal training
     , "G_lossfn_weight": 1.0
     , "G_charbonnier_eps": 1e-9
 
