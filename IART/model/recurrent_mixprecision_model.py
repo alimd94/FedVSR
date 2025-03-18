@@ -116,7 +116,7 @@ class RecurrentMixPrecisionRTModel(VideoRecurrentModel):
         # update the gradient when forward 4 times
         self.optimizer_g.zero_grad()
 
-        with autocast():
+        with autocast(): # add device_type to avoid error "device_type="cuda"  "
             self.output = self.net_g(self.lq)
             l_total = 0
             loss_dict = OrderedDict()

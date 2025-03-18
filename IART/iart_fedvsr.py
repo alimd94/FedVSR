@@ -156,7 +156,7 @@ NUM_PARTICIPATION = 4
 SAVE_DIR = "IART_FedVSR"
 
 
-class HighFreqLoss(nn.Module):
+class HighFreqLoss(torch.nn.Module):
     """Charbonnier Loss (L1)"""
 
     def __init__(self, eps=1e-9):
@@ -164,20 +164,20 @@ class HighFreqLoss(nn.Module):
         self.eps = eps
         self.dwt = DWTForward(J=1, wave='db1', mode='zero')
 
-    def forward(self, x, y,alpha=0.5,penalty=0.1):
-      
+    def forward(self, x, y,alpha=0.5,penalty=0.1):      
+        self.dwt.to(x.device) # Move the DWT to the device of x
+
         b,t, c, h, w = x.size()
         x = x.reshape(-1, c, h, w)
         y = y.reshape(-1, c, h, w)
 
         _, Yh_x = self.dwt(x)
         _, Yh_y = self.dwt(y)
-        # print("Yh requires_grad:", Yh_x[0].requires_grad)
         diff = Yh_x[0] - Yh_y[0]
         loss_hf = torch.mean(torch.sqrt((diff * diff) + self.eps))
 
-        alpha*loss_hf
-        return loss
+        
+        return alpha*loss_hf
 
 HiFreLoss = HighFreqLoss()
 
@@ -185,7 +185,6 @@ def get_parameters(net) -> List[np.ndarray]:
     return [val.cpu().numpy() for _, val in net.net_g.state_dict().items()]
 
 def set_parameters(net, parameters: List[np.ndarray]):
-    # print(type(parameters),"TYPEP")
     params_dict = zip(net.net_g.state_dict().keys(), parameters)
     state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
     net.net_g.load_state_dict(state_dict, strict=True)
@@ -250,7 +249,7 @@ class FlowerClient(NumPyClient):
     def fit(self, parameters,config):
         set_parameters(self.net, parameters)
 
-        loss = train_with_control_variates(self.net, self.trainloader,self.scaler,1)
+        loss = train_with_newLoss(self.net, self.trainloader,self.scaler,1)
 
         return get_parameters(self.net), len(self.trainloader), {'loss': loss}, 
 
@@ -367,7 +366,7 @@ flwr.simulation.start_simulation(
         num_clients=NUM_PARTITIONS,
         config=ServerConfig(num_rounds=NUM_ROUNDS,round_timeout=3600*24),
         client_resources={"num_gpus": 1,"num_cpus": 1},
-        strategy=SCAFFOLDStrategy(
+        strategy=FedVSRStrategy(
         fraction_fit=0.001,          
         min_fit_clients=NUM_PARTICIPATION,         
         min_available_clients=NUM_PARTICIPATION,
