@@ -7,11 +7,11 @@ This repository contains code and experiments for **FedVSR**, a method to train 
 
 We use the official implementations of the following models:
 
-- **VRT** and **RVRT**: [KAIR Repository](https://github.com/cszn/KAIR/tree/master)  
-  The code for training and evaluating VRT and RVRT models is based on the official KAIR repository by [cszn](https://github.com/cszn).
+- **VRT** and **RVRT**: 
+  The code for training and evaluating VRT and RVRT models is based on the official [KAIR Repository](https://github.com/cszn/KAIR/tree/master)  
 
-- **IART**: [IART Repository](https://github.com/kai422/IART)  
-  The implementation of IART is based on the official code released by [kai422](https://github.com/kai422).
+- **IART**: 
+  The implementation of IART is based on the official code released by [IART Repository](https://github.com/kai422/IART).
 
 Please refer to the respective repositories for additional details on model architecture, training strategies, and original paper references.
 
