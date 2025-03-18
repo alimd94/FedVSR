@@ -1,3 +1,4 @@
+[![Python](https://img.shields.io/badge/Python-3.12%2B-brightgreen)](https://www.python.org/)
 # FedVSR: Towards Model-Agnostic Federated Learning in Video Super-Resolution (Under Review)
 
 This repository contains code and experiments for **FedVSR**, a method to train Video Super-Resolution (VSR) models under the Federated Learning (FL) paradigm. The goal is to enable high-quality VSR while ensuring data privacy by not centralizing raw video data. This README provides instructions for installing dependencies, running experiments, and reproducing results.
