@@ -1,28 +1,9 @@
 [![Python](https://img.shields.io/badge/Python-3.12%2B-brightgreen)](https://www.python.org/)
 # FedVSR: Towards Model-Agnostic Federated Learning in Video Super-Resolution (Under Review)
 
-This repository contains code and experiments for **FedVSR**, a method to train Video Super-Resolution (VSR) models under the Federated Learning (FL) paradigm. The goal is to enable high-quality VSR while ensuring data privacy by not centralizing raw video data. This README provides instructions for installing dependencies, running experiments, and reproducing results.
+This is the official repository for **FedVSR** which contains code and experiments, a method to train Video Super-Resolution (VSR) models under the Federated Learning (FL) paradigm. The goal is to enable high-quality VSR while ensuring data privacy by not centralizing raw video data.
 
-## Code References
-
-We use the official implementations of the following models:
-
-- **VRT** and **RVRT**: 
-  The code for training and evaluating VRT and RVRT models is based on the official [KAIR Repository](https://github.com/cszn/KAIR/tree/master)  
-
-- **IART**: 
-  The implementation of IART is based on the official code released by [IART Repository](https://github.com/kai422/IART).
-
-Please refer to the respective repositories for additional details on model architecture, training strategies, and original paper references.
-
----
-
-## Project Overview
-
-- **What is FedVSR?**  
-  FedVSR is a federated training framework that allows multiple clients to train a shared video super-resolution model without sharing their raw data. This approach preserves data privacy and is suitable for scenarios where raw video footage is sensitive.
-
-## 📚 Key Contributions
+## Key Contributions
 
 ✅ Introduced a **model-agnostic and stateless FL framework** for VSR
 
@@ -33,6 +14,13 @@ Please refer to the respective repositories for additional details on model arch
 ✅ Achieved superior PSNR and SSIM across multiple VSR models and datasets.
 
 ✅ First framework addressing **Federated Learning for VSR**.
+
+
+## Project Overview
+
+- **What is FedVSR?**  
+  FedVSR is a federated training framework that allows multiple clients to train a shared video super-resolution model without sharing their raw data. This approach preserves data privacy and is suitable for scenarios where raw video footage is sensitive.
+
 
 <p align="center">
   <img width="800" src="sample.png">
@@ -134,3 +122,17 @@ python IART/test_scripts/test_IART_Vid4_N6.py
 <p align="center">
   <img width="800" src="result_table.png">
 </p>
+
+## Code References
+
+We use the official implementations of the following models:
+
+- **VRT** and **RVRT**: 
+  The code for training and evaluating VRT and RVRT models is based on the official [KAIR Repository](https://github.com/cszn/KAIR/tree/master)  
+
+- **IART**: 
+  The implementation of IART is based on the official code released by [IART Repository](https://github.com/kai422/IART).
+
+Please refer to the respective repositories for additional details on model architecture, training strategies, and original paper references.
+
+---
