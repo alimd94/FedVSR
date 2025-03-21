@@ -127,11 +127,14 @@ python IART/test_scripts/test_IART_Vid4_N6.py
 
 We use the official implementations of the following models:
 
-- **VRT** and **RVRT**: 
-  The code for training and evaluating VRT and RVRT models is based on the official [KAIR Repository](https://github.com/cszn/KAIR/tree/master)  
+- **VRT** and **RVRT**:  
+  The code for training and evaluating VRT and RVRT models is based on the official [KAIR Repository](https://github.com/cszn/KAIR/tree/master)
 
-- **IART**: 
+- **IART**:  
   The implementation of IART is based on the official code released by [IART Repository](https://github.com/kai422/IART).
+
+- **Federated Learning Framework**:  
+  We leverage the [Flower](https://github.com/adap/flower) framework for implementing and managing federated learning workflows.
 
 Please refer to the respective repositories for additional details on model architecture, training strategies, and original paper references.
 
