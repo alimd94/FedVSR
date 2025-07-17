@@ -20,8 +20,11 @@ from utils import utils_image as util
 from data.dataset_video_test import VideoRecurrentTestDataset, VideoTestVimeo90KDataset, \
     SingleVideoRecurrentTestDataset, VFI_DAVIS, VFI_UCF101, VFI_Vid4
 from load_model import load
+import lpips
 
-def main(path):
+MODEL_PATH = "model's path here"
+
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--task', type=str, default='002_VRT_videosr_bi_REDS_16frames', help='tasks: 001 to 008')
     parser.add_argument('--sigma', type=int, default=0, help='noise level for denoising: 10, 20, 30, 40, 50')
@@ -39,9 +42,12 @@ def main(path):
 
     # define model
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = prepare_model_dataset(args,path)
+    model = prepare_model_dataset(args)
     model.netG.eval()
     model = model.netG.to(device)
+    loss_fn_alex = lpips.LPIPS(net='alex')
+    loss_fn_alex = loss_fn_alex.to(device)
+    loss_fn_alex.eval()
     if 'vimeo' in args.folder_lq.lower():
         if 'videofi' in args.task:
             test_set = VideoTestVimeo90KDataset({'dataroot_gt':args.folder_gt, 'dataroot_lq':args.folder_gt,
@@ -76,6 +82,8 @@ def main(path):
     test_results['ssim'] = []
     test_results['psnr_y'] = []
     test_results['ssim_y'] = []
+    test_results['lpips'] = []
+
 
     assert len(test_loader) != 0, f'No dataset found at {args.folder_lq}'
 
@@ -100,6 +108,8 @@ def main(path):
         test_results_folder['ssim'] = []
         test_results_folder['psnr_y'] = []
         test_results_folder['ssim_y'] = []
+        test_results_folder['lpips'] = []
+
 
         for i in range(output.shape[1]):
             # save image
@@ -122,6 +132,12 @@ def main(path):
 
                 test_results_folder['psnr'].append(util.calculate_psnr(img, img_gt, border=0))
                 test_results_folder['ssim'].append(util.calculate_ssim(img, img_gt, border=0))
+                test_results_folder['lpips'].append(
+                                    loss_fn_alex(
+                                        (torch.from_numpy(img).permute(2, 0, 1).unsqueeze(0).to(device) * 2 - 1),
+                                        (torch.from_numpy(img_gt).permute(2, 0, 1).unsqueeze(0).to(device) * 2 - 1)
+                                    ).item()
+                                )
                 if img_gt.ndim == 3:  # RGB image
                     img = util.bgr2ycbcr(img.astype(np.float32) / 255.) * 255.
                     img_gt = util.bgr2ycbcr(img_gt.astype(np.float32) / 255.) * 255.
@@ -136,12 +152,14 @@ def main(path):
             ssim = sum(test_results_folder['ssim']) / len(test_results_folder['ssim'])
             psnr_y = sum(test_results_folder['psnr_y']) / len(test_results_folder['psnr_y'])
             ssim_y = sum(test_results_folder['ssim_y']) / len(test_results_folder['ssim_y'])
+            lpips_v = sum(test_results_folder['lpips']) / len(test_results_folder['lpips'])
             test_results['psnr'].append(psnr)
             test_results['ssim'].append(ssim)
             test_results['psnr_y'].append(psnr_y)
             test_results['ssim_y'].append(ssim_y)
-            print('Testing {:20s} ({:2d}/{}) - PSNR: {:.2f} dB; SSIM: {:.4f}; PSNR_Y: {:.2f} dB; SSIM_Y: {:.4f}'.
-                      format(folder[0], idx, len(test_loader), psnr, ssim, psnr_y, ssim_y))
+            test_results['lpips'].append(lpips_v)
+            print('Testing {:20s} ({:2d}/{}) - PSNR: {:.2f} dB; SSIM: {:.4f}; PSNR_Y: {:.2f} dB; SSIM_Y: {:.4f}; LPIPS: {:.4f}'.
+                      format(folder[0], idx, len(test_loader), psnr, ssim, psnr_y, ssim_y, lpips_v))
         else:
             print('Testing {:20s}  ({:2d}/{})'.format(folder[0], idx, len(test_loader)))
 
@@ -151,15 +169,12 @@ def main(path):
         ave_ssim = sum(test_results['ssim']) / len(test_results['ssim'])
         ave_psnr_y = sum(test_results['psnr_y']) / len(test_results['psnr_y'])
         ave_ssim_y = sum(test_results['ssim_y']) / len(test_results['ssim_y'])
-        log_file = f"vrt_reds_all.txt"
-        with open(log_file, "a") as f:
-            f.write('\n{} \n-- Average PSNR: {:.2f} dB; SSIM: {:.4f}; PSNR_Y: {:.2f} dB; SSIM_Y: {:.4f}'.
-              format(path, ave_psnr, ave_ssim, ave_psnr_y, ave_ssim_y))
-        # print('\n{} \n-- Average PSNR: {:.2f} dB; SSIM: {:.4f}; PSNR_Y: {:.2f} dB; SSIM_Y: {:.4f}'.
-        #       format(save_dir, ave_psnr, ave_ssim, ave_psnr_y, ave_ssim_y))
+        ave_lpips = sum(test_results['lpips']) / len(test_results['lpips'])
+        print('\n{} \n-- Average PSNR: {:.2f} dB; SSIM: {:.4f}; PSNR_Y: {:.2f} dB; SSIM_Y: {:.4f}; LPIPS: {:.4f}'.
+              format(save_dir, ave_psnr, ave_ssim, ave_psnr_y, ave_ssim_y, ave_lpips))
 
 
-def prepare_model_dataset(args,path):
+def prepare_model_dataset(args):
     ''' prepare model and dataset according to args.task. '''
 
     # define model
@@ -231,33 +246,20 @@ def prepare_model_dataset(args,path):
         model = net(upscale=1, out_chans=3, img_size=[4,192,192], window_size=[4,8,8], depths=[8,8,8,8,8,8,8, 4,4, 4,4],
                     indep_reconsts=[], embed_dims=[96,96,96,96,96,96,96, 120,120, 120,120],
                     num_heads=[6,6,6,6,6,6,6, 6,6, 6,6], pa_frames=0)
-        datasets = ['UCF101', 'DAVIS-train']  # 'Vimeo'. Vimeo dataset is too large. Please refer to #training to download it.
+        datasets = ['UCF101', 'DAVIS-train']  # 'Vimeo'.
         args.scale = 1
         args.window_size = [4,8,8]
         args.nonblind_denoising = False
 
-    # download model
-    model_path = path
-    # model_path = f'/data/weights_org/vrt_kivrt_kinetics_newloss_with_dwt/round_50_weights.pth'
-    # if os.path.exists(model_path):
-    #     print(f'loading model from ./model_zoo/vrt/{model_path}')
-    # else:
-    #     os.makedirs(os.path.dirname(model_path), exist_ok=True)
-    #     url = 'https://github.com/JingyunLiang/VRT/releases/download/v0.0/{}'.format(os.path.basename(model_path))
-    #     r = requests.get(url, allow_redirects=True)
-    #     print(f'downloading model {model_path}')
-    #     open(model_path, 'wb').write(r.content)
-
-    # pretrained_model = torch.load(model_path)
-    # model.load_state_dict(pretrained_model['params'] if 'params' in pretrained_model.keys() else pretrained_model, strict=True)
-    model = load(model_path)
+    global MODEL_PATH
+    model = load(MODEL_PATH)
 
     # download datasets
     if os.path.exists(f'{args.folder_lq}'):
         print(f'using dataset from {args.folder_lq}')
     else:
         if 'vimeo' in args.folder_lq.lower():
-            print(f'Vimeo dataset is not at {args.folder_lq}! Please refer to #training of Readme.md to download it.')
+            print(f'Vimeo dataset is not at {args.folder_lq}! Please download it first.')
         else:
             os.makedirs('testsets', exist_ok=True)
             for dataset in datasets:
@@ -378,163 +380,6 @@ def test_clip(lq, model, args):
 
 
 if __name__ == '__main__':
-   paths = [
-    # "/data/weights_org/vrt_kinetics_avg/round_1_weights.pth",
-    # "/data/weights_org/vrt_kinetics_avg/round_5_weights.pth",
-    # "/data/weights_org/vrt_kinetics_avg/round_10_weights.pth",
-    # "/data/weights_org/vrt_kinetics_avg/round_15_weights.pth",
-    "/data/weights_org/vrt_kinetics_avg/round_20_weights.pth",
-    # "/data/weights_org/vrt_kinetics_avg/round_25_weights.pth",
-    "/data/weights_org/vrt_kinetics_avg/round_30_weights.pth",
-    # "/data/weights_org/vrt_kinetics_avg/round_35_weights.pth",
-    "/data/weights_org/vrt_kinetics_avg/round_40_weights.pth",
-    # "/data/weights_org/vrt_kinetics_avg/round_45_weights.pth",
-    "/data/weights_org/vrt_kinetics_avg/round_50_weights.pth",
-    # "/data/weights_org/vrt_kinetics_avg/round_55_weights.pth",
-    "/data/weights_org/vrt_kinetics_avg/round_60_weights.pth",
-    # "/data/weights_org/vrt_kinetics_avg/round_65_weights.pth",
-    "/data/weights_org/vrt_kinetics_avg/round_70_weights.pth",
-    # "/data/weights_org/vrt_kinetics_avg/round_75_weights.pth",
-    "/data/weights_org/vrt_kinetics_avg/round_80_weights.pth",
-    # "/data/weights_org/vrt_kinetics_avg/round_85_weights.pth",
-    "/data/weights_org/vrt_kinetics_avg/round_90_weights.pth",
-    # "/data/weights_org/vrt_kinetics_avg/round_95_weights.pth",
-    "/data/weights_org/vrt_kinetics_avg/round_100_weights.pth",
-
-    "/data/weights_org/vrt_reds_avg/round_1_weights.pth",
-    # "/data/weights_org/vrt_reds_avg/round_5_weights.pth",
-    "/data/weights_org/vrt_reds_avg/round_10_weights.pth",
-    # "/data/weights_org/vrt_reds_avg/round_15_weights.pth",
-    "/data/weights_org/vrt_reds_avg/round_20_weights.pth",
-    # "/data/weights_org/vrt_reds_avg/round_25_weights.pth",
-    "/data/weights_org/vrt_reds_avg/round_30_weights.pth",
-    # "/data/weights_org/vrt_reds_avg/round_35_weights.pth",
-    "/data/weights_org/vrt_reds_avg/round_40_weights.pth",
-    # "/data/weights_org/vrt_reds_avg/round_45_weights.pth",
-    "/data/weights_org/vrt_reds_avg/round_50_weights.pth",
-    # "/data/weights_org/vrt_reds_avg/round_55_weights.pth",
-    "/data/weights_org/vrt_reds_avg/round_60_weights.pth",
-    # "/data/weights_org/vrt_reds_avg/round_65_weights.pth",
-    "/data/weights_org/vrt_reds_avg/round_70_weights.pth",
-    # "/data/weights_org/vrt_reds_avg/round_75_weights.pth",
-    "/data/weights_org/vrt_reds_avg/round_80_weights.pth",
-    # "/data/weights_org/vrt_reds_avg/round_85_weights.pth",
-    "/data/weights_org/vrt_reds_avg/round_90_weights.pth",
-    # "/data/weights_org/vrt_reds_avg/round_95_weights.pth",
-    "/data/weights_org/vrt_reds_avg/round_100_weights.pth",
-
-    "/data/weights_org/vrt_kinetics_scaffold/round_1_weights.pth",
-    # "/data/weights_org/vrt_kinetics_scaffold/round_5_weights.pth",
-    "/data/weights_org/vrt_kinetics_scaffold/round_10_weights.pth",
-    # "/data/weights_org/vrt_kinetics_scaffold/round_15_weights.pth",
-    "/data/weights_org/vrt_kinetics_scaffold/round_20_weights.pth",
-    # "/data/weights_org/vrt_kinetics_scaffold/round_25_weights.pth",
-    "/data/weights_org/vrt_kinetics_scaffold/round_30_weights.pth",
-    # "/data/weights_org/vrt_kinetics_scaffold/round_35_weights.pth",
-    "/data/weights_org/vrt_kinetics_scaffold/round_40_weights.pth",
-    # "/data/weights_org/vrt_kinetics_scaffold/round_45_weights.pth",
-    "/data/weights_org/vrt_kinetics_scaffold/round_50_weights.pth",
-    # "/data/weights_org/vrt_kinetics_scaffold/round_55_weights.pth",
-    "/data/weights_org/vrt_kinetics_scaffold/round_60_weights.pth",
-    # "/data/weights_org/vrt_kinetics_scaffold/round_65_weights.pth",
-    "/data/weights_org/vrt_kinetics_scaffold/round_70_weights.pth",
-    # "/data/weights_org/vrt_kinetics_scaffold/round_75_weights.pth",
-    "/data/weights_org/vrt_kinetics_scaffold/round_80_weights.pth",
-    # "/data/weights_org/vrt_kinetics_scaffold/round_85_weights.pth",
-    "/data/weights_org/vrt_kinetics_scaffold/round_90_weights.pth",
-    # "/data/weights_org/vrt_kinetics_scaffold/round_95_weights.pth",
-    "/data/weights_org/vrt_kinetics_scaffold/round_100_weights.pth",
-
-    "/data/weights_org/vrt_reds_scaffold/round_1_weights.pth",
-    # "/data/weights_org/vrt_reds_scaffold/round_5_weights.pth",
-    "/data/weights_org/vrt_reds_scaffold/round_10_weights.pth",
-    # "/data/weights_org/vrt_reds_scaffold/round_15_weights.pth",
-    "/data/weights_org/vrt_reds_scaffold/round_20_weights.pth",
-    # "/data/weights_org/vrt_reds_scaffold/round_25_weights.pth",
-    "/data/weights_org/vrt_reds_scaffold/round_30_weights.pth",
-    # "/data/weights_org/vrt_reds_scaffold/round_35_weights.pth",
-    "/data/weights_org/vrt_reds_scaffold/round_40_weights.pth",
-    # "/data/weights_org/vrt_reds_scaffold/round_45_weights.pth",
-    "/data/weights_org/vrt_reds_scaffold/round_50_weights.pth",
-    # "/data/weights_org/vrt_reds_scaffold/round_55_weights.pth",
-    "/data/weights_org/vrt_reds_scaffold/round_60_weights.pth",
-    # "/data/weights_org/vrt_reds_scaffold/round_65_weights.pth",
-    "/data/weights_org/vrt_reds_scaffold/round_70_weights.pth",
-    # "/data/weights_org/vrt_reds_scaffold/round_75_weights.pth",
-    "/data/weights_org/vrt_reds_scaffold/round_80_weights.pth",
-    # "/data/weights_org/vrt_reds_scaffold/round_85_weights.pth",
-    "/data/weights_org/vrt_reds_scaffold/round_90_weights.pth",
-    # "/data/weights_org/vrt_reds_scaffold/round_95_weights.pth",
-    "/data/weights_org/vrt_reds_scaffold/round_100_weights.pth",
-
-    "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_1_weights.pth",
-    # "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_5_weights.pth",
-    "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_10_weights.pth",
-    # "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_15_weights.pth",
-    "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_20_weights.pth",
-    # "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_25_weights.pth",
-    "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_30_weights.pth",
-    # "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_35_weights.pth",
-    "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_40_weights.pth",
-    # "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_45_weights.pth",
-    "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_50_weights.pth",
-    # "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_55_weights.pth",
-    "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_60_weights.pth",
-    # "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_65_weights.pth",
-    "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_70_weights.pth",
-    # "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_75_weights.pth",
-    "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_80_weights.pth",
-    # "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_85_weights.pth",
-    "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_90_weights.pth",
-    # "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_95_weights.pth",
-    "/data/weights_org/vrt_kinetics_agg_with_loss_dwtLoss_2/round_100_weights.pth",
-
-    "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_1_weights.pth",
-    # "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_5_weights.pth",
-    "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_10_weights.pth",
-    # "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_15_weights.pth",
-    "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_20_weights.pth",
-    # "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_25_weights.pth",
-    "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_30_weights.pth",
-    # "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_35_weights.pth",
-    "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_40_weights.pth",
-    # "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_45_weights.pth",
-    "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_50_weights.pth",
-    # "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_55_weights.pth",
-    "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_60_weights.pth",
-    # "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_65_weights.pth",
-    "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_70_weights.pth",
-    # "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_75_weights.pth",
-    "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_80_weights.pth",
-    # "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_85_weights.pth",
-    "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_90_weights.pth",
-    # "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_95_weights.pth",
-    "/data/weights_org/vrt_reds_agg_with_loss_dwtLoss/round_100_weights.pth",
-
-    "/data/weights_org/vrt_reds_prox_mu1e3/round_1_weights.pth",
-    # "/data/weights_org/vrt_reds_prox_mu1e3/round_5_weights.pth",
-    "/data/weights_org/vrt_reds_prox_mu1e3/round_10_weights.pth",
-    # "/data/weights_org/vrt_reds_prox_mu1e3/round_15_weights.pth",
-    "/data/weights_org/vrt_reds_prox_mu1e3/round_20_weights.pth",
-    # "/data/weights_org/vrt_reds_prox_mu1e3/round_25_weights.pth",
-    "/data/weights_org/vrt_reds_prox_mu1e3/round_30_weights.pth",
-    # "/data/weights_org/vrt_reds_prox_mu1e3/round_35_weights.pth",
-    "/data/weights_org/vrt_reds_prox_mu1e3/round_40_weights.pth",
-    # "/data/weights_org/vrt_reds_prox_mu1e3/round_45_weights.pth",
-    "/data/weights_org/vrt_reds_prox_mu1e3/round_50_weights.pth",
-    # "/data/weights_org/vrt_reds_prox_mu1e3/round_55_weights.pth",
-    "/data/weights_org/vrt_reds_prox_mu1e3/round_60_weights.pth",
-    # "/data/weights_org/vrt_reds_prox_mu1e3/round_65_weights.pth",
-    "/data/weights_org/vrt_reds_prox_mu1e3/round_70_weights.pth",
-    # "/data/weights_org/vrt_reds_prox_mu1e3/round_75_weights.pth",
-    "/data/weights_org/vrt_reds_prox_mu1e3/round_80_weights.pth",
-    # "/data/weights_org/vrt_reds_prox_mu1e3/round_85_weights.pth",
-    "/data/weights_org/vrt_reds_prox_mu1e3/round_90_weights.pth",
-    # "/data/weights_org/vrt_reds_prox_mu1e3/round_95_weights.pth",
-    "/data/weights_org/vrt_reds_prox_mu1e3/round_100_weights.pth"
-]
-
-for path in paths:
-        main(path)
+     main()
 
 

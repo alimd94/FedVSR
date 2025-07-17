@@ -19,6 +19,7 @@ from models.network_rvrt import RVRT as net
 from utils import utils_image as util
 from data.dataset_video_test import VideoRecurrentTestDataset, VideoTestVimeo90KDataset, SingleVideoRecurrentTestDataset
 from load_model import load
+import lpips
 
 MODEL_PATH = "model's path here"
 
@@ -43,6 +44,9 @@ def main():
     model = prepare_model_dataset(args)
     model.netG.eval()
     model = model.netG.to(device)
+    loss_fn_alex = lpips.LPIPS(net='alex')
+    loss_fn_alex = loss_fn_alex.to(device)
+    loss_fn_alex.eval()
     if 'vimeo' in args.folder_lq.lower():
         test_set = VideoTestVimeo90KDataset({'dataroot_gt':args.folder_gt, 'dataroot_lq':args.folder_lq,
                                            'meta_info_file': "data/meta_info/meta_info_Vimeo90K_test_GT.txt",
@@ -64,6 +68,8 @@ def main():
     test_results['ssim'] = []
     test_results['psnr_y'] = []
     test_results['ssim_y'] = []
+    test_results['lpips'] = []
+
 
     assert len(test_loader) != 0, f'No dataset found at {args.folder_lq}'
 
@@ -85,6 +91,8 @@ def main():
         test_results_folder['ssim'] = []
         test_results_folder['psnr_y'] = []
         test_results_folder['ssim_y'] = []
+        test_results_folder['lpips'] = []
+
 
         for i in range(output.shape[1]):
             # save image
@@ -107,6 +115,12 @@ def main():
 
                 test_results_folder['psnr'].append(util.calculate_psnr(img, img_gt, border=0))
                 test_results_folder['ssim'].append(util.calculate_ssim(img, img_gt, border=0))
+                test_results_folder['lpips'].append(
+                                    loss_fn_alex(
+                                        (torch.from_numpy(img).permute(2, 0, 1).unsqueeze(0).to(device) * 2 - 1),
+                                        (torch.from_numpy(img_gt).permute(2, 0, 1).unsqueeze(0).to(device) * 2 - 1)
+                                    ).item()
+                                )
                 if img_gt.ndim == 3:  # RGB image
                     img = util.bgr2ycbcr(img.astype(np.float32) / 255.) * 255.
                     img_gt = util.bgr2ycbcr(img_gt.astype(np.float32) / 255.) * 255.
@@ -121,12 +135,14 @@ def main():
             ssim = sum(test_results_folder['ssim']) / len(test_results_folder['ssim'])
             psnr_y = sum(test_results_folder['psnr_y']) / len(test_results_folder['psnr_y'])
             ssim_y = sum(test_results_folder['ssim_y']) / len(test_results_folder['ssim_y'])
+            lpips_v = sum(test_results_folder['lpips']) / len(test_results_folder['lpips'])
             test_results['psnr'].append(psnr)
             test_results['ssim'].append(ssim)
             test_results['psnr_y'].append(psnr_y)
             test_results['ssim_y'].append(ssim_y)
-            print('Testing {:20s} ({:2d}/{}) - PSNR: {:.2f} dB; SSIM: {:.4f}; PSNR_Y: {:.2f} dB; SSIM_Y: {:.4f}'.
-                      format(folder[0], idx, len(test_loader), psnr, ssim, psnr_y, ssim_y))
+            test_results['lpips'].append(lpips_v)
+            print('Testing {:20s} ({:2d}/{}) - PSNR: {:.2f} dB; SSIM: {:.4f}; PSNR_Y: {:.2f} dB; SSIM_Y: {:.4f}; LPIPS: {:.4f}'.
+                      format(folder[0], idx, len(test_loader), psnr, ssim, psnr_y, ssim_y, lpips_v))
         else:
             print('Testing {:20s}  ({:2d}/{})'.format(folder[0], idx, len(test_loader)))
 
@@ -136,7 +152,9 @@ def main():
         ave_ssim = sum(test_results['ssim']) / len(test_results['ssim'])
         ave_psnr_y = sum(test_results['psnr_y']) / len(test_results['psnr_y'])
         ave_ssim_y = sum(test_results['ssim_y']) / len(test_results['ssim_y'])
-        print('\n{} \n-- Average PSNR: {:.2f} dB; SSIM: {:.4f}; PSNR_Y: {:.2f} dB; SSIM_Y: {:.4f}'.format(path.split("/")[-1], ave_psnr, ave_ssim, ave_psnr_y, ave_ssim_y))
+        ave_lpips = sum(test_results['lpips']) / len(test_results['lpips'])
+        print('\n{} \n-- Average PSNR: {:.2f} dB; SSIM: {:.4f}; PSNR_Y: {:.2f} dB; SSIM_Y: {:.4f}; LPIPS: {:.4f}'.
+              format(save_dir, ave_psnr, ave_ssim, ave_psnr_y, ave_ssim_y, ave_lpips))
 
 
 def prepare_model_dataset(args):
@@ -158,7 +176,7 @@ def prepare_model_dataset(args):
                     depths=[2, 2, 2], embed_dims=[144, 144, 144], num_heads=[6, 6, 6],
                     inputconv_groups=[1, 1, 1, 1, 1, 1], deformable_groups=12, attention_heads=12,
                     attention_window=[3, 3], cpu_cache_length=100)
-        datasets = ['Vid4'] # 'Vimeo'. Vimeo dataset is too large. Please refer to #training to download it.
+        datasets = ['Vid4'] # 'Vimeo'.
         args.scale = 4
         args.window_size = [2,8,8]
         args.nonblind_denoising = False
@@ -201,7 +219,7 @@ def prepare_model_dataset(args):
         print(f'using dataset from {args.folder_lq}')
     else:
         if 'vimeo' in args.folder_lq.lower():
-            print(f'Vimeo dataset is not at {args.folder_lq}! Please refer to #training of Readme.md to download it.')
+            print(f'Vimeo dataset is not at {args.folder_lq}! Please download it first.')
         else:
             os.makedirs('testsets', exist_ok=True)
             for dataset in datasets:
