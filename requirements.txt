@@ -78,6 +78,7 @@ pycryptodome==3.21.0
 Pygments==2.18.0
 pyparsing==3.2.0
 python-dateutil==2.9.0.post0
+pytorch_wavelets @ file:///home/userful/Ali/FedVSR/KAIR/pytorch_wavelets
 pytz==2024.2
 PyWavelets==1.8.0
 PyYAML==6.0.2
