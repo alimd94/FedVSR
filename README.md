@@ -1,7 +1,17 @@
 [![Python](https://img.shields.io/badge/Python-3.12%2B-brightgreen)](https://www.python.org/)
 # FedVSR: Towards Model-Agnostic Federated Learning in Video Super-Resolution (Under Review)
 
+
 This is the official repository for **FedVSR** which contains code and experiments, a method to train Video Super-Resolution (VSR) models under the Federated Learning (FL) paradigm. The goal is to enable high-quality VSR while ensuring data privacy by not centralizing raw video data.
+
+
+## Updates
+
+| Date       | Change |
+|------------|--------|
+| 2025-08-12 | Added **Pretrained Weights** section with Google Drive link |
+| 2025-07-17 | Integrated the **LPIPS** metric into the evaluation pipeline. |
+
 
 ## Key Contributions
 
