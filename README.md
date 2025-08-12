@@ -11,7 +11,7 @@ This is the official repository for **FedVSR** which contains code and experimen
 
 ✅ Proposed a **loss-aware weighted aggregation** method with a decay strategy.
 
-✅ Achieved superior PSNR and SSIM across multiple VSR models and datasets.
+✅ Achieved superior PSNR, SSIM and LPIPS across multiple VSR models and datasets.
 
 ✅ First framework addressing **Federated Learning for VSR**.
 
@@ -112,6 +112,19 @@ To test IART you would use:
 python IART/test_scripts/test_IART_REDS4_N6.py 
 python IART/test_scripts/test_IART_Vid4_N6.py
 ```
+## Pretrained Weights
+
+Download all trained weights [**here** ](https://drive.google.com/drive/folders/13zQvm3nAuC5yEX7vUCuolwK0HzK-kO93?usp=sharing
+)
+
+**Organization (folder structure):**
+- **Model type:** `VRT/`, `RVRT/`, `IART/`
+
+Each folder contains the corresponding checkpoint(s).
+
+**Naming convention:** `<Model>_on_<Dataset>_with_<FL-Algorithm>.pth`  
+*Example:* `VRT_on_REDS_with_FedVSR.pth`
+
 
 ## Results
 
