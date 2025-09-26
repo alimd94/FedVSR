@@ -1,0 +1,241 @@
+video,label,label_column
+0,feeding birds,0
+1,feeding birds,0
+2,feeding birds,0
+3,feeding birds,0
+4,feeding birds,0
+5,feeding birds,0
+6,planting trees,1
+7,planting trees,1
+8,planting trees,1
+9,planting trees,1
+10,planting trees,1
+11,planting trees,1
+12,rock climbing,2
+13,rock climbing,2
+14,rock climbing,2
+15,rock climbing,2
+16,rock climbing,2
+17,rock climbing,2
+18,sailing,3
+19,sailing,3
+20,sailing,3
+21,sailing,3
+22,sailing,3
+23,sailing,3
+24,bee keeping,4
+25,bee keeping,4
+26,bee keeping,4
+27,bee keeping,4
+28,bee keeping,4
+29,bee keeping,4
+30,archery,5
+31,archery,5
+32,archery,5
+33,archery,5
+34,archery,5
+35,archery,5
+36,bungee jumping,6
+37,bungee jumping,6
+38,bungee jumping,6
+39,bungee jumping,6
+40,bungee jumping,6
+41,bungee jumping,6
+42,surfing water,7
+43,surfing water,7
+44,surfing water,7
+45,surfing water,7
+46,surfing water,7
+47,surfing water,7
+48,skiing crosscountry,8
+49,skiing crosscountry,8
+50,skiing crosscountry,8
+51,skiing crosscountry,8
+52,skiing crosscountry,8
+53,skiing crosscountry,8
+54,playing paintball,9
+55,playing paintball,9
+56,playing paintball,9
+57,playing paintball,9
+58,playing paintball,9
+59,playing paintball,9
+60,snowboarding,10
+61,snowboarding,10
+62,snowboarding,10
+63,snowboarding,10
+64,snowboarding,10
+65,snowboarding,10
+66,playing piano,11
+67,playing piano,11
+68,playing piano,11
+69,playing piano,11
+70,playing piano,11
+71,playing piano,11
+72,playing bagpipes,12
+73,playing bagpipes,12
+74,playing bagpipes,12
+75,playing bagpipes,12
+76,playing bagpipes,12
+77,playing bagpipes,12
+78,playing didgeridoo,13
+79,playing didgeridoo,13
+80,playing didgeridoo,13
+81,playing didgeridoo,13
+82,playing didgeridoo,13
+83,playing didgeridoo,13
+84,playing violin,14
+85,playing violin,14
+86,playing violin,14
+87,playing violin,14
+88,playing violin,14
+89,playing violin,14
+90,playing accordion,15
+91,playing accordion,15
+92,playing accordion,15
+93,playing accordion,15
+94,playing accordion,15
+95,playing accordion,15
+96,dancing gangnam style,16
+97,dancing gangnam style,16
+98,dancing gangnam style,16
+99,dancing gangnam style,16
+100,dancing gangnam style,16
+101,dancing gangnam style,16
+102,marching,17
+103,marching,17
+104,marching,17
+105,marching,17
+106,marching,17
+107,marching,17
+108,tap dancing,18
+109,tap dancing,18
+110,tap dancing,18
+111,tap dancing,18
+112,tap dancing,18
+113,tap dancing,18
+114,robot dancing,19
+115,robot dancing,19
+116,robot dancing,19
+117,robot dancing,19
+118,robot dancing,19
+119,robot dancing,19
+120,yoga,20
+121,yoga,20
+122,yoga,20
+123,yoga,20
+124,yoga,20
+125,yoga,20
+126,baking cookies,21
+127,baking cookies,21
+128,baking cookies,21
+129,baking cookies,21
+130,baking cookies,21
+131,baking cookies,21
+132,peeling potatoes,22
+133,peeling potatoes,22
+134,peeling potatoes,22
+135,peeling potatoes,22
+136,peeling potatoes,22
+137,peeling potatoes,22
+138,breading or breadcrumbing,23
+139,breading or breadcrumbing,23
+140,breading or breadcrumbing,23
+141,breading or breadcrumbing,23
+142,breading or breadcrumbing,23
+143,breading or breadcrumbing,23
+144,making pizza,24
+145,making pizza,24
+146,making pizza,24
+147,making pizza,24
+148,making pizza,24
+149,making pizza,24
+150,making tea,25
+151,making tea,25
+152,making tea,25
+153,making tea,25
+154,making tea,25
+155,making tea,25
+156,feeding fish,26
+157,feeding fish,26
+158,feeding fish,26
+159,feeding fish,26
+160,feeding fish,26
+161,feeding fish,26
+162,riding elephant,27
+163,riding elephant,27
+164,riding elephant,27
+165,riding elephant,27
+166,riding elephant,27
+167,riding elephant,27
+168,milking cow,28
+169,milking cow,28
+170,milking cow,28
+171,milking cow,28
+172,milking cow,28
+173,milking cow,28
+174,petting cat,29
+175,petting cat,29
+176,petting cat,29
+177,petting cat,29
+178,petting cat,29
+179,petting cat,29
+180,feeding goats,30
+181,feeding goats,30
+182,feeding goats,30
+183,feeding goats,30
+184,feeding goats,30
+185,feeding goats,30
+186,blowing glass,31
+187,blowing glass,31
+188,blowing glass,31
+189,blowing glass,31
+190,blowing glass,31
+191,blowing glass,31
+192,carving pumpkin,32
+193,carving pumpkin,32
+194,carving pumpkin,32
+195,carving pumpkin,32
+196,carving pumpkin,32
+197,carving pumpkin,32
+198,braiding hair,33
+199,braiding hair,33
+200,braiding hair,33
+201,braiding hair,33
+202,braiding hair,33
+203,braiding hair,33
+204,building cabinet,34
+205,building cabinet,34
+206,building cabinet,34
+207,building cabinet,34
+208,building cabinet,34
+209,building cabinet,34
+210,folding paper,35
+211,folding paper,35
+212,folding paper,35
+213,folding paper,35
+214,folding paper,35
+215,folding paper,35
+216,snowmobiling,36
+217,snowmobiling,36
+218,snowmobiling,36
+219,snowmobiling,36
+220,snowmobiling,36
+221,snowmobiling,36
+222,spray painting,37
+223,spray painting,37
+224,spray painting,37
+225,spray painting,37
+226,spray painting,37
+227,spray painting,37
+228,swinging on something,38
+229,swinging on something,38
+230,swinging on something,38
+231,swinging on something,38
+232,swinging on something,38
+233,swinging on something,38
+234,decorating the christmas tree,39
+235,decorating the christmas tree,39
+236,decorating the christmas tree,39
+237,decorating the christmas tree,39
+238,decorating the christmas tree,39
+239,decorating the christmas tree,39
