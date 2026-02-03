@@ -4,6 +4,11 @@
 
 This is the official repository for **FedVSR** which contains code and experiments, a method to train Video Super-Resolution (VSR) models under the Federated Learning (FL) paradigm. The goal is to enable high-quality VSR while ensuring data privacy by not centralizing raw video data.
 
+## Update
+
+**15 January 2026:** 🎉 This work has been accepted at the ACM Multimedia Systems (MMSys) 2026.
+
+
 
 ## Key Contributions
 
@@ -18,18 +23,18 @@ This is the official repository for **FedVSR** which contains code and experimen
 ✅ First framework addressing **Federated Learning for VSR**.
 
 
-## Project Overview
+## Project Overview 📹✨
 
 - **What is FedVSR?**  
-  FedVSR is a federated training framework that allows multiple clients to train a shared video super-resolution model without sharing their raw data. This approach preserves data privacy and is suitable for scenarios where raw video footage is sensitive.
+  FedVSR is a federated training framework that enables multiple clients to collaboratively train a shared video super-resolution (VSR) model **without sharing their raw data**. This approach preserves data privacy and is ideal for scenarios where raw video footage is sensitive. 🔒
 
 <p align="center">
-  <img width="800" src="Assets/system_diagram.png">
+  <img width="800" src="Assets/system.png" alt="FedVSR System Overview">
 </p>
 
+**Overview of the proposed FedVSR framework:**  
+Each client computes an **architecture-agnostic VSR update** augmented with a **DWT-based high-frequency loss**. Clients also track the **average local loss**, which is used for **loss-aware weighted aggregation** at the server. The global model is iteratively refined while maintaining **architecture-agnostic** and **stateless** properties. ⚡
 
-
-> *Note: This code is released under review status; therefore, no direct citations are referenced in this repo.*
 
 ---
 
@@ -116,19 +121,44 @@ python IART/test_scripts/test_IART_REDS4_N6.py
 python IART/test_scripts/test_IART_Vid4_N6.py
 ```
 
-## Results
+## Results 📊
+
+### Quantitative Results
 
 <p align="center">
-  <img width="800" src="Assets/result_graph.png">
+  <img width="800" src="Assets/result_graph.png" alt="Quantitative Results Graph">
 </p>
 
-<p align="center">
-  <img width="800" src="Assets/result_table.png">
-</p>
+Comparison of **PSNR (↑), SSIM (↑), LPIPS (↓), and VMAF (↑)** for different federated learning (FL) algorithms across various VSR models and datasets under varying levels of heterogeneity.
 
 <p align="center">
-  <img width="800" src="Assets/ablation.png">
+  <img width="800" src="Assets/result_table.png" alt="Quantitative Results Table">
 </p>
+
+**PSNR across different rounds** for various test sets under different settings for **VRT, RVRT, and IART**.
+
+<p align="center">
+  <img width="800" src="Assets/results_vrt.png" alt="VRT Results">
+</p>
+
+PSNR, SSIM, and LPIPS values across different rounds for various test sets under different settings for **VRT**.
+
+<p align="center">
+  <img width="800" src="Assets/results_rvrt.png" alt="RVRT Results">
+</p>
+
+PSNR, SSIM, and LPIPS values across different rounds for various test sets under different settings for **RVRT**.
+
+<p align="center">
+  <img width="800" src="Assets/results_iart.png" alt="IART Results">
+</p>
+
+PSNR, SSIM, and LPIPS values across different rounds for various test sets under different settings for **IART**.
+
+
+
+
+ ### Qualitiative Results
 
 <p align="center">
   <img width="800" src="Assets/sample1.png">
@@ -146,15 +176,44 @@ python IART/test_scripts/test_IART_Vid4_N6.py
   <img width="800" src="Assets/sample4.png">
 </p>
 
+### Ablation Study 🧪
+
 <p align="center">
-  <img width="800" src="Assets/results_vrt.png">
+  <img width="800" src="Assets/ablation.png" alt="Ablation Study">
 </p>
+
+Ablation study on the impact of **L_HiFr** and **adaptive aggregation** under different heterogeneity settings.
+
 <p align="center">
-  <img width="800" src="Assets/results_rvrt.png">
+  <img width="800" src="Assets/et.png" alt="Extreme Test Results">
 </p>
+
+Extreme test results for **FedAvg** and **FedVSR** under varying heterogeneity settings. Here, **TC** denotes the total number of clients and **PR** denotes the participation rate.
+
 <p align="center">
-  <img width="800" src="Assets/results_iart.png">
+  <img width="800" src="Assets/overhead.png" alt="Computation and Memory Overhead">
 </p>
+
+Computation and memory overhead of different FL methods relative to **FedAvg (%)**. GPU memory and utilization are reported for both **Training** and **Aggregation** phases.
+
+<p align="center">
+  <img width="800" src="Assets/cpst.png" alt="Client Population Stress Test">
+</p>
+
+**FedVSR** vs. **FedAvg** under client population stress tests.
+
+<p align="center">
+  <img width="800" src="Assets/let.png" alt="Effect of Local Epochs">
+</p>
+
+Effect of **local epochs** on **FedVSR** and **FedAvg** (% of 100-round FedVSR with 1 local epoch).
+
+<p align="center">
+  <img width="800" src="Assets/failures.png" alt="Client Upload Failures">
+</p>
+
+Impact of **client upload failures** (0–75%) on **FedVSR** vs. **FedAvg**, showing **FedVSR’s higher robustness**.
+
 
 
 ## Code References
@@ -173,6 +232,11 @@ We use the official implementations of the following models:
 Please refer to the respective repositories for additional details on model architecture, training strategies, and original paper references.
 
 
-## Citation
+## Citation 📚
 
-This work is currently under review. A formal citation will be added once the review process is complete.  In the meantime, feel free to ⭐ star the repository if you find it helpful! 😊
+*To be added.*
+
+## Support
+
+If you find this work useful, feel free to ⭐ star the repository! 😊
+
