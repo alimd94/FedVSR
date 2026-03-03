@@ -81,10 +81,11 @@ Each client computes an **architecture-agnostic VSR update** augmented with a **
 To prepare the dataset, follow [BasicSR](https://github.com/XPixelGroup/BasicSR/blob/master/docs/DatasetPreparation.md#Video-Super-Resolution). After completing the preparation, the directory structure should be as follows: 
 
 ```
-datasets/
+Path of main dir/
 ├──REDS/
-│   └──val_REDS4_sharp
-│   └──val_REDS4_sharp_bicubic
+│   └──train/
+│   └────train_sharp
+│   └────train_sharp_bicubic/X4
 ```
 
 ## Training
