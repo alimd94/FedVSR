@@ -26,7 +26,7 @@
       , "filename_ext": "png"
       , "val_partition": "REDS4"
       , "test_mode": false
-      , "io_backend": {"type": "lmdb"}
+      , "io_backend": {"type": "disk"}
       , "num_frame": 6
       , "gt_size": 256
       , "interval_list": [1]
