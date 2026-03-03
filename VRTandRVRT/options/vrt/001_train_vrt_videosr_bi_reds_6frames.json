@@ -19,9 +19,9 @@
     "train": {
       "name": "train_dataset"
       , "dataset_type": "VideoRecurrentTrainDataset"
-      , "dataroot_gt": "trainsets/REDS/train_sharp_with_val.lmdb"
-      , "dataroot_lq": "trainsets/REDS/train_sharp_bicubic_with_val.lmdb"
-      , "meta_info_file": "data/meta_info/meta_info_REDS_GT.txt"
+      , "dataroot_gt": "Path to REDS/train/train_sharp"
+      , "dataroot_lq": "Path to REDS/train/train_sharp_bicubic/X4"
+      , "meta_info_file": "data/meta_info/meta_info_REDS_GT_new.txt"
       , "filename_tmpl": "08d"
       , "filename_ext": "png"
       , "val_partition": "REDS4"
