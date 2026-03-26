@@ -1,8 +1,12 @@
 [![Python](https://img.shields.io/badge/Python-3.12%2B-brightgreen)](https://www.python.org/)
+[![arXiv](https://img.shields.io/badge/arXiv-2503.13745-8c1b13.svg)](https://arxiv.org/abs/2503.13745)
+
 # FedVSR: Towards Model-Agnostic Federated Learning in Video Super-Resolution
 
 
 This is the official repository for **FedVSR** which contains code and experiments, a method to train Video Super-Resolution (VSR) models under the Federated Learning (FL) paradigm. The goal is to enable high-quality VSR while ensuring data privacy by not centralizing raw video data.
+
+📄 Read the Arxiv preprint: [https://arxiv.org/abs/XXXX.XXXXX](https://arxiv.org/abs/2503.13745)
 
 ## Update
 
@@ -235,9 +239,23 @@ Please refer to the respective repositories for additional details on model arch
 
 ## Citation 📚
 
-*To be added.*
+```bibtext
+@inproceedings{dehaghi2025fedvsrmodelagnosticfederatedlearning,
+  author = {Ali Mollaahmadi Dehaghi and Hossein KhademSohi and Reza Razavi and Steve Drew and Mohammad Moshirpour},
+  title = {FedVSR: Towards Model-Agnostic Federated Learning in Video Super-Resolution},
+  year = {2026},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  url = {https://doi.org/10.1145/3793853.3795752},
+  doi = {10.1145/3793853.3795752},
+  booktitle = {Proceedings of the 17th ACM Multimedia Systems Conference},
+  numpages = {12},
+  location = {Hong Kong, Hong Kong},
+  series = {MMSys '26}
+}
+```
 
-## Support
+## Citing & Supporting
 
-If you find this work useful, feel free to ⭐ star the repository! 😊
+If you find this work useful, please consider ⭐ starring the repository and citing our paper! 😊
 
