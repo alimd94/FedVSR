@@ -240,7 +240,7 @@ Please refer to the respective repositories for additional details on model arch
 ## Citation 📚
 
 ```bibtext
-@inproceedings{dehaghi2025fedvsrmodelagnosticfederatedlearning,
+@inproceedings{dehaghi2026fedvsr,
   author = {Ali Mollaahmadi Dehaghi and Hossein KhademSohi and Reza Razavi and Steve Drew and Mohammad Moshirpour},
   title = {FedVSR: Towards Model-Agnostic Federated Learning in Video Super-Resolution},
   year = {2026},
