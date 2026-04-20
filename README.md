@@ -6,7 +6,7 @@
 
 This is the official repository for **FedVSR** which contains code and experiments, a method to train Video Super-Resolution (VSR) models under the Federated Learning (FL) paradigm. The goal is to enable high-quality VSR while ensuring data privacy by not centralizing raw video data.
 
-📄 Read the Arxiv preprint [here](https://arxiv.org/abs/2503.13745)
+📄 Read the Arxiv preprint [here](https://arxiv.org/abs/2503.13745) and the published version [here](https://dl.acm.org/doi/10.1145/3793853.3795752)
 
 ## Update
 
